@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistical Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    
+    .container {
+      text-align: center;
+    }
+    
+    input[type="text"], input[type="button"] {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Statistical Calculator</h1>
+  <input type="text" id="numbers" placeholder="Enter numbers separated by commas">
+  <br>
+  <input type="button" value="Calculate" onclick="calculateStatistics()">
+  <br><br>
+  <div id="result"></div>
+</div>
+
+<script>
+  function calculateStatistics() {
+    var numbersInput = document.getElementById('numbers').value.trim();
+    var numbersArray = numbersInput.split(',').map(function(item) {
+      return parseFloat(item.trim());
+    }).filter(function(item) {
+      return !isNaN(item);
+    });
+
+    if (numbersArray.length === 0) {
+      document.getElementById('result').innerText = 'Please enter valid numbers.';
+      return;
+    }
+
+    var mean = calculateMean(numbersArray);
+    var median = calculateMedian(numbersArray);
+    var stdDev = calculateStandardDeviation(numbersArray);
+    var interquartileRange = calculateInterquartileRange(numbersArray);
+
+    var resultText = 'Mean: ' + mean.toFixed(2) + '<br>';
+    resultText += 'Median: ' + median.toFixed(2) + '<br>';
+    resultText += 'Standard Deviation: ' + stdDev.toFixed(2) + '<br>';
+    resultText += 'Interquartile Range: ' + interquartileRange.toFixed(2) + '<br>';
+
+    document.getElementById('result').innerHTML = resultText;
+  }
+
+  function calculateMean(numbers) {
+    var sum = numbers.reduce(function(a, b) { return a + b; }, 0);
+    return sum / numbers.length;
+  }
+
+  function calculateMedian(numbers) {
+    var sorted = numbers.slice().sort(function(a, b) { return a - b; });
+    var middle = Math.floor(sorted.length / 2);
+    if (sorted.length % 2 === 0) {
+      return (sorted[middle - 1] + sorted[middle]) / 2;
+    } else {
+      return sorted[middle];
+    }
+  }
+
+  function calculateStandardDeviation(numbers) {
+    var mean = calculateMean(numbers);
+    var variance = numbers.reduce(function(sum, value) {
+      return sum + Math.pow(value - mean, 2);
+    }, 0) / numbers.length;
+    return Math.sqrt(variance);
+  }
+
+  function calculateInterquartileRange(numbers) {
+    var sorted = numbers.slice().sort(function(a, b) { return a - b; });
+    var lowerQuartile = quartile(sorted, 0.25);
+    var upperQuartile = quartile(sorted, 0.75);
+    return upperQuartile - lowerQuartile;
+  }
+
+  function quartile(numbers, q) {
+    var pos = (numbers.length - 1) * q;
+    var base = Math.floor(pos);
+    var rest = pos - base;
+    if (numbers[base + 1] !== undefined) {
+      return numbers[base] + rest * (numbers[base + 1] - numbers[base]);
+    } else {
+      return numbers[base];
+    }
+  }
+</script>
+
+</body>
+</html>
